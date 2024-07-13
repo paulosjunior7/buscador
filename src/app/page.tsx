@@ -1,113 +1,200 @@
+"use client";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, Search } from "lucide-react";
 import Image from "next/image";
+import { useFormik } from "formik";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
+  const formik = useFormik({
+    initialValues: {
+      origem: "",
+      destino: "",
+      isRoundTrip: true,
+      dataIda: "",
+      dataVolta: "",
+      company: "SMILES",
+    },
+    onSubmit: (values) => {
+      console.log(values);
+      busca(
+        values.origem,
+        values.destino,
+        values.isRoundTrip,
+        values.dataIda,
+        values.dataVolta,
+        values.company
+      );
+    },
+  });
+
+  function getTimeStamp(date: string) {
+    if (!date || date.trim() === "") return "";
+    const dateTime = new Date(date + "T13:00:00Z");
+
+    const timeStamp = dateTime.getTime();
+    return timeStamp.toString();
+  }
+
+  function busca(
+    origem: string,
+    destino: string,
+    isRoundTrip: boolean,
+    dataIda: any,
+    dataVolta: any,
+    company: any
+  ) {
+    if (company == "TUDOAZUL") {
+      if (isRoundTrip)
+        window.open(
+          `https://azulpelomundo.voeazul.com.br/flights/RT/${origem}/${destino}/-/-/${dataIda}/${dataVolta}/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
+        );
+      else
+        window.open(
+          `https://azulpelomundo.voeazul.com.br/flights/OW/${origem}/${destino}/-/-/${dataIda}/-/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
+        );
+    }
+
+    if (company == "SMILES") {
+      //
+      if (dataIda != null && dataIda != undefined) {
+        dataIda = getTimeStamp(dataIda);
+      }
+
+      if (dataVolta != null && dataVolta != undefined) {
+        if (!isRoundTrip) dataVolta = "";
+        else {
+          dataVolta = getTimeStamp(dataVolta);
+        }
+      }
+
+      console.log(getTimeStamp(dataIda));
+      isRoundTrip === true ? 1 : 2;
+      const FormatedIsRoundTrip = isRoundTrip ? 1 : 2;
+
+      window.open(
+        `https://www.smiles.com.br/mfe/emissao-passagem/?adults=1&cabin=ALL&children=0&departureDate=${dataIda}&infants=0&isElegible=false&isFlexibleDateChecked=false&returnDate=${dataVolta}&searchType=congenere&segments=1&tripType=${FormatedIsRoundTrip}&originAirport=${origem.toUpperCase()}&originCity=&originCountry=&originAirportIsAny=false&destinationAirport=${destino.toUpperCase()}&destinCity=&destinCountry=&destinAirportIsAny=false&novo-resultado-voos=true000000`
+      );
+    }
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main>
+      <form
+        className="grid grid-cols-2 gap-4 p-4"
+        onSubmit={formik.handleSubmit}
+      >
+        <div className="px-1">
+          <Label htmlFor="origem">Origem</Label>
+          <Input
+            name="origem"
+            placeholder="Origem"
+            id="origem"
+            max={3}
+            onChange={formik.handleChange}
+            value={formik.values.origem}
+          />
         </div>
-      </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+        <div className="px-1">
+          <Label htmlFor="destino">Destino</Label>
+          <Input
+            name="destino"
+            placeholder="Destino"
+            max={3}
+            id="destino"
+            onChange={formik.handleChange}
+            value={formik.values.destino}
+          />
+        </div>
+        <div className="px-1 ">
+          <Label htmlFor="origem">Ida e volta</Label>
+          <Select
+            defaultValue={formik.values.isRoundTrip.toString()}
+            onValueChange={(e) => {
+              console.log(e);
+              formik.setFieldValue(
+                "isRoundTrip",
+                e.toString() === "true" ? true : false
+              );
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="true">ida e volta</SelectItem>
+                <SelectItem value="false">Somente ida</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+        <div className="px-1 ">
+          <Label htmlFor="origem">Companhia aérea</Label>
+          <Select
+            defaultValue={formik.values.company}
+            onValueChange={(e) => {
+              formik.setFieldValue("company", e);
+            }}
+            name="company"
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Companhia aérea" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="TUDOAZUL">Tudo Azul</SelectItem>
+                <SelectItem value="SMILES">Smiles</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+        <div className="px-1">
+          <Label htmlFor="dataIda">Data de ida</Label>
+          <Input
+            type="date"
+            name="dataIda"
+            id="dataIda"
+            min={new Date().toISOString().split("T")[0]}
+            onChange={formik.handleChange}
+            value={formik.values.dataIda}
+          />
+        </div>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+        <div className="px-1">
+          <Label htmlFor="dataVolta">Data de volta</Label>
+          <Input
+            type="date"
+            name="dataVolta"
+            id="dataVolta"
+            min={formik.values.dataIda}
+            onChange={formik.handleChange}
+            disabled={!formik.values.isRoundTrip}
+            value={formik.values.dataVolta}
+          />
+        </div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+        <Button type="submit" className="col-span-2 mt-2">
+          <div className="flex items-center justify-center gap-2">
+            <Search className="h-6 w-6" />
+            <span>Buscar</span>
+          </div>
+        </Button>
+      </form>
     </main>
   );
 }
