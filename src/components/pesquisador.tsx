@@ -78,7 +78,7 @@ export default function PesquisarAeroportos({
   >([]);
 
   async function SearchAirports() {
-    const response = await fetch("http://localhost:3000/api/airports", {
+    const response = await fetch("https://buscador-omega.vercel.app/api/airports", {
       method: "GET",
       next: {
         revalidate: 1,
