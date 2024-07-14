@@ -15,6 +15,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import PesquisarAeroportos from "@/components/pesquisador";
+
+interface Airport {
+  city: string;
+  name: string;
+  iata: string;
+  label: string;
+  value: string;
+  cityAirportName: string;
+  id: string;
+  country: string;
+  icao: string;
+  latitude: string;
+  longitude: string;
+  altitude: string;
+  timezone: string;
+  dst: string;
+  tz: string;
+  type: string;
+  source: string;
+  countryAlpha2: string;
+  cityIsoCode: string;
+}
 
 export default function Home() {
   const formik = useFormik({
@@ -46,6 +70,24 @@ export default function Home() {
     const timeStamp = dateTime.getTime();
     return timeStamp.toString();
   }
+
+  const [airports, setAirports] = useState<Airport[]>([]);
+
+  async function SearchAirports() {
+    const response = await fetch("http://localhost:3000/api/airports", {
+      method: "GET",
+      next: {
+        revalidate: 1,
+      },
+    }).then((res) => res.json());
+
+    setAirports(response.airports);
+  }
+
+  console.log(airports);
+  useEffect(() => {
+    SearchAirports();
+  }, []);
 
   function busca(
     origem: string,
@@ -89,6 +131,9 @@ export default function Home() {
     }
   }
 
+  const [openOrigem, setOpenOrigem] = useState(false);
+  const [openDestino, setOpenDestino] = useState(false);
+
   return (
     <main>
       <form
@@ -102,8 +147,19 @@ export default function Home() {
             placeholder="Origem"
             id="origem"
             max={3}
-            onChange={formik.handleChange}
-            value={formik.values.origem}
+            onClick={() => {
+              if (formik?.values?.origem === "") {
+                setOpenOrigem(true);
+              }
+            }}
+            onChangeCapture={(e) => {
+              if (typeof e === "string") {
+                formik.setFieldValue("origem", e);
+              } else {
+                formik.setFieldValue("origem", "");
+              }
+            }}
+            value={formik.values.origem || ""}
           />
         </div>
 
@@ -112,12 +168,24 @@ export default function Home() {
           <Input
             name="destino"
             placeholder="Destino"
-            max={3}
             id="destino"
-            onChange={formik.handleChange}
-            value={formik.values.destino}
+            max={3}
+            onClick={() => {
+              if (formik?.values?.destino === "") {
+                setOpenDestino(true);
+              }
+            }}
+            onChangeCapture={(e) => {
+              if (typeof e === "string") {
+                formik.setFieldValue("destino", e);
+              } else {
+                formik.setFieldValue("destino", "");
+              }
+            }}
+            value={formik.values.destino || ""}
           />
         </div>
+
         <div className="px-1 ">
           <Label htmlFor="origem">Ida e volta</Label>
           <Select
@@ -188,12 +256,38 @@ export default function Home() {
           />
         </div>
 
-        <Button type="submit" className="col-span-2 mt-2">
+        <Button
+          type="submit"
+          className="col-span-2 mt-2"
+          disabled={
+            formik.values.origem === "" ||
+            formik.values.destino === "" ||
+            formik.values.dataIda === ""
+          }
+        >
           <div className="flex items-center justify-center gap-2">
             <Search className="h-6 w-6" />
             <span>Buscar</span>
           </div>
         </Button>
+
+        <PesquisarAeroportos
+          setOpen={setOpenOrigem}
+          open={openOrigem}
+          handlefieldValue={(e) => {
+            console.log(e);
+            formik.setFieldValue("origem", e);
+          }}
+        />
+
+        <PesquisarAeroportos
+          setOpen={setOpenDestino}
+          open={openDestino}
+          handlefieldValue={(e) => {
+            console.log(e);
+            formik.setFieldValue("destino", e);
+          }}
+        />
       </form>
     </main>
   );
