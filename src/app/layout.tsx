@@ -14,7 +14,16 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Bell, House, Badge, Menu, Plane, SearchCheck } from "lucide-react";
+import {
+  Bell,
+  House,
+  Badge,
+  Menu,
+  Plane,
+  SearchCheck,
+  History,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -63,14 +72,24 @@ export default function RootLayout({
                   <div className="flex-1">
                     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                       <Link
-                        href="#"
+                        href="/"
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                           pathname.includes('="#') ? "bg-muted" : ""
                         )}
                       >
-                        <SearchCheck className="h-4 w-4" />
+                        <Search className="h-4 w-4" />
                         Buscar
+                      </Link>
+                      <Link
+                        href="/history"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                          pathname.includes('="#') ? "bg-muted" : ""
+                        )}
+                      >
+                        <History className="h-4 w-4" />
+                        Histórico
                       </Link>
                     </nav>
                   </div>
@@ -101,33 +120,27 @@ export default function RootLayout({
                         </Link>
 
                         <Link
-                          href="/obras"
-                          className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                          href="/"
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                            pathname.includes('="#') ? "bg-muted" : ""
+                          )}
                         >
-                          <House className="h-5 w-5" />
-                          Obras
-                          <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                            6
-                          </Badge>
+                          <SearchCheck className="h-4 w-4" />
+                          Buscar
+                        </Link>
+                        <Link
+                          href="/history"
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                            pathname.includes('="#') ? "bg-muted" : ""
+                          )}
+                        >
+                          <SearchCheck className="h-4 w-4" />
+                          Histórico
                         </Link>
                         <Separator />
                       </nav>
-                      <div className="mt-auto">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>Upgrade to Pro</CardTitle>
-                            <CardDescription>
-                              Unlock all features and get unlimited access to
-                              our support team.
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <Button size="sm" className="w-full">
-                              Upgrade
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      </div>
                     </SheetContent>
                   </Sheet>
                   <div className="w-full flex-1"></div>

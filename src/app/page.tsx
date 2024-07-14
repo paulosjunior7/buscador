@@ -1,5 +1,4 @@
 "use client";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Search } from "lucide-react";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import PesquisarAeroportos from "@/components/pesquisador";
+import { getCookie, setCookie } from "cookies-next";
 
 interface Airport {
   city: string;
@@ -51,7 +51,6 @@ export default function Home() {
       company: "SMILES",
     },
     onSubmit: (values) => {
-      console.log(values);
       busca(
         values.origem,
         values.destino,
@@ -60,6 +59,21 @@ export default function Home() {
         values.dataVolta,
         values.company
       );
+
+      const history = JSON.parse(getCookie("history") || "[]");
+      history.push({
+        origem: values.origem,
+        destino: values.destino,
+        isRoundTrip: values.isRoundTrip,
+        dataIda: values.dataIda,
+        dataVolta: values.dataVolta,
+        company: values.company,
+        date: new Date().toISOString(),
+      });
+      setCookie("history", JSON.stringify(history), {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
     },
   });
 

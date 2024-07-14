@@ -78,12 +78,15 @@ export default function PesquisarAeroportos({
   >([]);
 
   async function SearchAirports() {
-    const response = await fetch("https://buscador-omega.vercel.app/api/airports", {
-      method: "GET",
-      next: {
-        revalidate: 1,
-      },
-    }).then((res) => res.json());
+    const response = await fetch(
+      "https://buscador-omega.vercel.app/api/airports",
+      {
+        method: "GET",
+        next: {
+          revalidate: 1,
+        },
+      }
+    ).then((res) => res.json());
 
     setAirports(response.airports);
   }
@@ -125,12 +128,7 @@ export default function PesquisarAeroportos({
   };
 
   return (
-    <>
-      {/* <p className="text-sm text-muted-foreground">
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">⌘</span>J
-        </kbd>
-      </p> */}
+    <div className="">
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
           placeholder="Pesquisar aeroporto."
@@ -179,6 +177,6 @@ export default function PesquisarAeroportos({
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-    </>
+    </div>
   );
 }
