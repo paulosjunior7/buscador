@@ -13,7 +13,16 @@ import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Bell, Menu, Plane, SearchCheck, History, Search } from "lucide-react";
+import {
+  Bell,
+  Menu,
+  Plane,
+  SearchCheck,
+  History,
+  Search,
+  Radar,
+  RadarIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -81,6 +90,16 @@ export default function RootLayout({
                         <History className="h-4 w-4" />
                         Histórico
                       </Link>
+                      <Link
+                        href="/radar"
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                          pathname.includes('="#') ? "bg-muted" : ""
+                        )}
+                      >
+                        <RadarIcon className="h-4 w-4" />
+                        Radar
+                      </Link>
                     </nav>
                   </div>
                   <div className="mt-auto p-4"></div>
@@ -131,6 +150,18 @@ export default function RootLayout({
                           >
                             <SearchCheck className="h-4 w-4" />
                             Histórico
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/radar"
+                            className={cn(
+                              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                              pathname.includes('="#') ? "bg-muted" : ""
+                            )}
+                          >
+                            <RadarIcon className="h-4 w-4" />
+                            Radar
                           </Link>
                         </SheetClose>
                         <Separator />

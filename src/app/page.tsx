@@ -80,24 +80,8 @@ export default function Home() {
     },
   });
 
-  const [airports, setAirports] = useState<Airport[]>([]);
   const [openOrigem, setOpenOrigem] = useState(false);
   const [openDestino, setOpenDestino] = useState(false);
-
-  async function SearchAirports() {
-    const response = await fetch("http://localhost:3000/api/airports", {
-      method: "GET",
-      next: {
-        revalidate: 60 * 60 * 24, // 24 hours
-      },
-    }).then((res) => res.json());
-
-    setAirports(response.airports);
-  }
-
-  useEffect(() => {
-    SearchAirports();
-  }, []);
 
   const addDays = (date: string, days: number): string => {
     const result = new Date(date);
