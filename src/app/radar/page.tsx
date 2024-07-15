@@ -34,7 +34,7 @@ interface Radar {
 
 export const getRadar = async () => {
   const response = await fetch(
-    "https://starkmiles-dev.azurewebsites.net/api/GetRadarAppFunction?&usuarioId=30",
+    "https://starkmiles-dev.azurewebsites.net/api/GetRadarAppFunction?code=p0WmwzGI-w1Krrd6fLaz5Xf6dUthW-MpkSgt3jf9Qz3_AzFuviD7_Q==&usuarioId=30",
     {
       headers: {
         accept: "application/json, text/plain, */*",
