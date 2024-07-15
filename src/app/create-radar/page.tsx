@@ -1,20 +1,3 @@
-// fetch(
-//   "https://starkmiles-dev.azurewebsites.net/api/CrawlerToBusFunction?code=AzzSdWxuBerFJpdcjN_CeijV6K0BNybtoyg3xdKBSzFkAzFunhTkyg==",
-//   {
-//     headers: {
-//       accept: "*/*",
-//       "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-//       "content-type": "application/json",
-//       "sec-fetch-dest": "empty",
-//       "sec-fetch-mode": "cors",
-//       "sec-fetch-site": "cross-site",
-//       Referer: "https://milhas.codestark.com.br/",
-//       "Referrer-Policy": "strict-origin-when-cross-origin",
-//     },
-//     body: '{"usuarioId":"30","origem":"GYN - Santa Genoveva / Goiânia / GO","destino":"DFW - Dallas/Fort Worth International Airport / Dallas, TX","dataIda":"17/09/2024","dataVolta":"25/09/2024","cabine":"ECONOMY","flexibilidade":"1","programaFidelidade":"Smiles","imgFidelidade":"https://all.accor.com/loyalty-program/partners/assets/images/airlines/smiles.svg","tipoViagem":"RT"}',
-//     method: "POST",
-//   }
-// );
 "use client";
 import PesquisarAeroportos from "@/components/pesquisador";
 import { Button } from "@/components/ui/button";
@@ -29,8 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFormik } from "formik";
-import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Airport {
   city: string;
@@ -53,17 +35,6 @@ interface Airport {
   countryAlpha2: string;
   cityIsoCode: string;
 }
-
-// cabine: "ECONOMY";
-// dataIda: "18/07/2024";
-// dataVolta: "";
-// destino: "GRU - Guarulhos / SP";
-// flexibilidade: "5";
-// imgFidelidade: "https://all.accor.com/loyalty-program/partners/assets/images/airlines/smiles.svg";
-// origem: "GYN - Santa Genoveva / Goiânia / GO";
-// programaFidelidade: "Smiles";
-// tipoViagem: "OW";
-// usuarioId: "30";
 
 export default function Radar() {
   const formik = useFormik({
