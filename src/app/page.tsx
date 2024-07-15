@@ -1,8 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Search } from "lucide-react";
-import Image from "next/image";
+import { Search } from "lucide-react";
 import { useFormik } from "formik";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import PesquisarAeroportos from "@/components/pesquisador";
 import { getCookie, setCookie } from "cookies-next";
+import { addDays } from "date-fns";
 
 interface Airport {
   city: string;
@@ -49,6 +49,7 @@ export default function Home() {
       dataIda: "",
       dataVolta: "",
       company: "SMILES",
+      flexibilidade: 1,
     },
     onSubmit: (values) => {
       busca(
@@ -57,7 +58,8 @@ export default function Home() {
         values.isRoundTrip,
         values.dataIda,
         values.dataVolta,
-        values.company
+        values.company,
+        values.flexibilidade
       );
 
       const history = JSON.parse(getCookie("history") || "[]");
@@ -68,6 +70,7 @@ export default function Home() {
         dataIda: values.dataIda,
         dataVolta: values.dataVolta,
         company: values.company,
+        flexibilidade: values.flexibilidade,
         date: new Date().toISOString(),
       });
       setCookie("history", JSON.stringify(history), {
@@ -77,31 +80,41 @@ export default function Home() {
     },
   });
 
-  function getTimeStamp(date: string) {
-    if (!date || date.trim() === "") return "";
-    const dateTime = new Date(date + "T13:00:00Z");
-
-    const timeStamp = dateTime.getTime();
-    return timeStamp.toString();
-  }
-
   const [airports, setAirports] = useState<Airport[]>([]);
+  const [openOrigem, setOpenOrigem] = useState(false);
+  const [openDestino, setOpenDestino] = useState(false);
 
   async function SearchAirports() {
     const response = await fetch("http://localhost:3000/api/airports", {
       method: "GET",
       next: {
-        revalidate: 1,
+        revalidate: 60 * 60 * 24, // 24 hours
       },
     }).then((res) => res.json());
 
     setAirports(response.airports);
   }
 
-  console.log(airports);
   useEffect(() => {
     SearchAirports();
   }, []);
+
+  const addDays = (date: string, days: number): string => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result.toISOString().split("T")[0]; // Retorna apenas a data no formato 'YYYY-MM-DD'
+  };
+
+  const getTimeStamp = (date: any, flexibilidade?: number): string => {
+    if (!date || date.trim() === "") return "";
+    let newDate = date;
+    if (flexibilidade) {
+      newDate = addDays(date, flexibilidade);
+    }
+    const dateTime = new Date(newDate + "T00:00:00Z");
+    const timeStamp = dateTime.getTime();
+    return timeStamp.toString();
+  };
 
   function busca(
     origem: string,
@@ -109,21 +122,24 @@ export default function Home() {
     isRoundTrip: boolean,
     dataIda: any,
     dataVolta: any,
-    company: any
+    company: any,
+    flexibilidade: number
   ) {
-    if (company == "TUDOAZUL") {
-      if (isRoundTrip)
-        window.open(
-          `https://azulpelomundo.voeazul.com.br/flights/RT/${origem}/${destino}/-/-/${dataIda}/${dataVolta}/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
-        );
-      else
-        window.open(
-          `https://azulpelomundo.voeazul.com.br/flights/OW/${origem}/${destino}/-/-/${dataIda}/-/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
-        );
-    }
-
     if (company == "SMILES") {
-      //
+      const idaDates: any[] = Array.from(
+        { length: flexibilidade },
+        (_, i) => i
+      ).map((e) => {
+        return getTimeStamp(dataIda, e);
+      });
+
+      const voltaDates: any[] = Array.from(
+        { length: flexibilidade },
+        (_, i) => i
+      ).map((e) => {
+        return getTimeStamp(dataVolta, e);
+      });
+
       if (dataIda != null && dataIda != undefined) {
         dataIda = getTimeStamp(dataIda);
       }
@@ -135,18 +151,57 @@ export default function Home() {
         }
       }
 
-      console.log(getTimeStamp(dataIda));
-      isRoundTrip === true ? 1 : 2;
       const FormatedIsRoundTrip = isRoundTrip ? 1 : 2;
 
-      window.open(
-        `https://www.smiles.com.br/mfe/emissao-passagem/?adults=1&cabin=ALL&children=0&departureDate=${dataIda}&infants=0&isElegible=false&isFlexibleDateChecked=false&returnDate=${dataVolta}&searchType=congenere&segments=1&tripType=${FormatedIsRoundTrip}&originAirport=${origem.toUpperCase()}&originCity=&originCountry=&originAirportIsAny=false&destinationAirport=${destino.toUpperCase()}&destinCity=&destinCountry=&destinAirportIsAny=false&novo-resultado-voos=true000000`
-      );
+      if (!isRoundTrip) {
+        idaDates.forEach((e) => {
+          window.open(
+            `https://www.smiles.com.br/mfe/emissao-passagem/?adults=1&cabin=ALL&children=0&departureDate=${e}&infants=0&isElegible=false&isFlexibleDateChecked=false&returnDate=${dataVolta}&searchType=congenere&segments=1&tripType=${FormatedIsRoundTrip}&originAirport=${origem.toUpperCase()}&originCity=&originCountry=&originAirportIsAny=false&destinationAirport=${destino.toUpperCase()}&destinCity=&destinCountry=&destinAirportIsAny=false&novo-resultado-voos=true000000`
+          );
+        });
+      } else {
+        idaDates.forEach((e) => {
+          voltaDates.forEach((v) => {
+            window.open(
+              `https://www.smiles.com.br/mfe/emissao-passagem/?adults=1&cabin=ALL&children=0&departureDate=${e}&infants=0&isElegible=false&isFlexibleDateChecked=false&returnDate=${v}&searchType=congenere&segments=1&tripType=${FormatedIsRoundTrip}&originAirport=${origem.toUpperCase()}&originCity=&originCountry=&originAirportIsAny=false&destinationAirport=${destino.toUpperCase()}&destinCity=&destinCountry=&destinAirportIsAny=false&novo-resultado-voos=true000000`
+            );
+          });
+        });
+      }
+    }
+
+    if (company == "TUDOAZUL") {
+      const idaDates: any[] = Array.from(
+        { length: flexibilidade },
+        (_, i) => i
+      ).map((e) => {
+        return getTimeStamp(dataIda, e);
+      });
+
+      const voltaDates: any[] = Array.from(
+        { length: flexibilidade },
+        (_, i) => i
+      ).map((e) => {
+        return getTimeStamp(dataVolta, e);
+      });
+
+      if (isRoundTrip) {
+        idaDates.forEach((e) => {
+          voltaDates.forEach((v) => {
+            window.open(
+              `https://azulpelomundo.voeazul.com.br/flights/RT/${origem}/${destino}/-/-/${e}/${v}/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
+            );
+          });
+        });
+      } else {
+        idaDates.forEach((e) => {
+          window.open(
+            `https://azulpelomundo.voeazul.com.br/flights/OW/${origem}/${destino}/-/-/${e}/-/1/0/0/0/0/ALL/F/ECONOMY/-/-/-/-/A/-`
+          );
+        });
+      }
     }
   }
-
-  const [openOrigem, setOpenOrigem] = useState(false);
-  const [openDestino, setOpenDestino] = useState(false);
 
   return (
     <main>
@@ -201,11 +256,10 @@ export default function Home() {
         </div>
 
         <div className="px-1 ">
-          <Label htmlFor="origem">Ida e volta</Label>
+          <Label htmlFor="origem">Tipo</Label>
           <Select
             defaultValue={formik.values.isRoundTrip.toString()}
             onValueChange={(e) => {
-              console.log(e);
               formik.setFieldValue(
                 "isRoundTrip",
                 e.toString() === "true" ? true : false
@@ -219,6 +273,31 @@ export default function Home() {
               <SelectGroup>
                 <SelectItem value="true">ida e volta</SelectItem>
                 <SelectItem value="false">Somente ida</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="px-1">
+          <Label htmlFor="flexibilidade">Flexibilidade</Label>
+          <Select
+            defaultValue={formik.values.flexibilidade.toString()}
+            onValueChange={(e) => {
+              formik.setFieldValue("flexibilidade", e);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Flexibilidade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="1">1</SelectItem>
+                <SelectItem value="2">2</SelectItem>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="4">4</SelectItem>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="6">6</SelectItem>
+                <SelectItem value="7">7</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -244,6 +323,8 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
+
+        <div></div>
 
         <div className="px-1">
           <Label htmlFor="dataIda">Data de ida</Label>
@@ -289,7 +370,6 @@ export default function Home() {
           setOpen={setOpenOrigem}
           open={openOrigem}
           handlefieldValue={(e) => {
-            console.log(e);
             formik.setFieldValue("origem", e);
           }}
         />
@@ -298,7 +378,6 @@ export default function Home() {
           setOpen={setOpenDestino}
           open={openDestino}
           handlefieldValue={(e) => {
-            console.log(e);
             formik.setFieldValue("destino", e);
           }}
         />

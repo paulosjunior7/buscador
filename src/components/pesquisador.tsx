@@ -83,7 +83,7 @@ export default function PesquisarAeroportos({
       {
         method: "GET",
         next: {
-          revalidate: 1,
+          revalidate: 60,
         },
       }
     ).then((res) => res.json());
@@ -112,7 +112,6 @@ export default function PesquisarAeroportos({
       setResultadosAeroportos([]);
     } else {
       const results = findAirPort(filter, airports);
-      console.log(results);
       setResultadosAeroportos(results);
     }
   }, [filter, airports]);

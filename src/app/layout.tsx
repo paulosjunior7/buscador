@@ -2,28 +2,18 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+
 import { cn } from "@/lib/utils";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import {
-  Bell,
-  House,
-  Badge,
-  Menu,
-  Plane,
-  SearchCheck,
-  History,
-  Search,
-} from "lucide-react";
+import { Bell, Menu, Plane, SearchCheck, History, Search } from "lucide-react";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -119,26 +109,30 @@ export default function RootLayout({
                           <span className="sr-only">Buscador</span>
                         </Link>
 
-                        <Link
-                          href="/"
-                          className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                            pathname.includes('="#') ? "bg-muted" : ""
-                          )}
-                        >
-                          <SearchCheck className="h-4 w-4" />
-                          Buscar
-                        </Link>
-                        <Link
-                          href="/history"
-                          className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                            pathname.includes('="#') ? "bg-muted" : ""
-                          )}
-                        >
-                          <SearchCheck className="h-4 w-4" />
-                          Histórico
-                        </Link>
+                        <SheetClose asChild>
+                          <Link
+                            href="/"
+                            className={cn(
+                              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                              pathname.includes('="#') ? "bg-muted" : ""
+                            )}
+                          >
+                            <Search className="h-4 w-4" />
+                            Buscar
+                          </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Link
+                            href="/history"
+                            className={cn(
+                              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                              pathname.includes('="#') ? "bg-muted" : ""
+                            )}
+                          >
+                            <SearchCheck className="h-4 w-4" />
+                            Histórico
+                          </Link>
+                        </SheetClose>
                         <Separator />
                       </nav>
                     </SheetContent>
