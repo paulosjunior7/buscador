@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search } from "lucide-react";
+import { Eraser, Search, X } from "lucide-react";
 import { useFormik } from "formik";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,8 +43,8 @@ interface Airport {
 export default function Home() {
   const formik = useFormik({
     initialValues: {
-      origem: "",
-      destino: "",
+      origem: [],
+      destino: [],
       isRoundTrip: true,
       dataIda: "",
       dataVolta: "",
@@ -52,15 +52,19 @@ export default function Home() {
       flexibilidade: 1,
     },
     onSubmit: (values) => {
-      busca(
-        values.origem,
-        values.destino,
-        values.isRoundTrip,
-        values.dataIda,
-        values.dataVolta,
-        values.company,
-        values.flexibilidade
-      );
+      values.origem.forEach((origem) => {
+        values.destino.forEach((destino) => {
+          busca(
+            origem,
+            destino,
+            values.isRoundTrip,
+            values.dataIda,
+            values.dataVolta,
+            values.company,
+            values.flexibilidade
+          );
+        });
+      });
 
       const history = JSON.parse(getCookie("history") || "[]");
       history.push({
@@ -193,7 +197,7 @@ export default function Home() {
         className="grid grid-cols-2 gap-4 p-4"
         onSubmit={formik.handleSubmit}
       >
-        <div className="px-1">
+        <div className="px-1 relative">
           <Label htmlFor="origem">Origem</Label>
           <Input
             name="origem"
@@ -201,22 +205,32 @@ export default function Home() {
             id="origem"
             max={3}
             onClick={() => {
-              if (formik?.values?.origem === "") {
-                setOpenOrigem(true);
-              }
+              setOpenOrigem(true);
             }}
             onChangeCapture={(e) => {
               if (typeof e === "string") {
-                formik.setFieldValue("origem", e);
-              } else {
-                formik.setFieldValue("origem", "");
+                formik.setFieldValue(
+                  "origem",
+                  (e as string)
+                    ?.split(",")
+                    .map((s: string) => s.trim().toUpperCase())
+                );
               }
             }}
-            value={formik.values.origem || ""}
+            value={
+              formik?.values?.origem.length > 0 ? formik.values.origem : ""
+            }
           />
+          {formik?.values?.origem.length > 0 && (
+            <X
+              className="absolute size-5 right-3 top-[34px] cursor-pointer"
+              onClick={() => {
+                formik.setFieldValue("origem", []);
+              }}
+            />
+          )}
         </div>
-
-        <div className="px-1">
+        <div className="px-1 relative">
           <Label htmlFor="destino">Destino</Label>
           <Input
             name="destino"
@@ -224,21 +238,31 @@ export default function Home() {
             id="destino"
             max={3}
             onClick={() => {
-              if (formik?.values?.destino === "") {
-                setOpenDestino(true);
-              }
+              setOpenDestino(true);
             }}
             onChangeCapture={(e) => {
               if (typeof e === "string") {
-                formik.setFieldValue("destino", e);
-              } else {
-                formik.setFieldValue("destino", "");
+                formik.setFieldValue(
+                  "destino",
+                  (e as string)
+                    ?.split(",")
+                    .map((s: string) => s.trim().toUpperCase())
+                );
               }
             }}
-            value={formik.values.destino || ""}
+            value={
+              formik?.values?.destino.length > 0 ? formik.values.destino : ""
+            }
           />
+          {formik?.values?.destino.length > 0 && (
+            <X
+              className="absolute size-5 right-3 top-[34px] cursor-pointer"
+              onClick={() => {
+                formik.setFieldValue("destino", []);
+              }}
+            />
+          )}
         </div>
-
         <div className="px-1 ">
           <Label htmlFor="origem">Tipo</Label>
           <Select
@@ -261,7 +285,6 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
         <div className="px-1">
           <Label htmlFor="flexibilidade">Flexibilidade</Label>
           <Select
@@ -286,7 +309,6 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
         <div className="px-1 ">
           <Label htmlFor="origem">Companhia aérea</Label>
           <Select
@@ -307,9 +329,7 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
         <div></div>
-
         <div className="px-1">
           <Label htmlFor="dataIda">Data de ida</Label>
           <Input
@@ -321,7 +341,6 @@ export default function Home() {
             value={formik.values.dataIda}
           />
         </div>
-
         <div className="px-1">
           <Label htmlFor="dataVolta">Data de volta</Label>
           <Input
@@ -334,13 +353,12 @@ export default function Home() {
             value={formik.values.dataVolta}
           />
         </div>
-
         <Button
           type="submit"
           className="col-span-2 mt-2"
           disabled={
-            formik.values.origem === "" ||
-            formik.values.destino === "" ||
+            formik.values.origem.length === 0 ||
+            formik.values.destino.length === 0 ||
             formik.values.dataIda === ""
           }
         >
@@ -353,16 +371,21 @@ export default function Home() {
         <PesquisarAeroportos
           setOpen={setOpenOrigem}
           open={openOrigem}
-          handlefieldValue={(e) => {
-            formik.setFieldValue("origem", e);
+          handlefieldValue={(newValues) => {
+            formik.setFieldValue("origem", [
+              ...formik.values.origem,
+              ...newValues.split(",").map((s) => s.trim().toUpperCase()),
+            ]);
           }}
         />
-
         <PesquisarAeroportos
           setOpen={setOpenDestino}
           open={openDestino}
-          handlefieldValue={(e) => {
-            formik.setFieldValue("destino", e);
+          handlefieldValue={(newValues) => {
+            formik.setFieldValue("destino", [
+              ...formik.values.destino,
+              ...newValues.split(",").map((s) => s.trim().toUpperCase()),
+            ]);
           }}
         />
       </form>
